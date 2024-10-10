@@ -4,6 +4,7 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -39,9 +40,12 @@ class Actor(models.Model):
 
 
 def get_movie_image_path(instance, filename) -> pathlib.Path:
-    filename = (f"slugify {instance.title}-{uuid.uuid4()}"
-                + pathlib.Path(filename).suffix)
-    return pathlib.Path("uploads/movies/") / pathlib.Path(filename)
+    unique_filename = f"{slugify(instance.title)}-{uuid.uuid4()}{pathlib.Path(filename).suffix}"
+    return pathlib.Path("uploads/movies") / unique_filename
+
+
+def slugify(value: str) -> str:
+    return value.lower().replace(" ", "-")
 
 
 class Movie(models.Model):
